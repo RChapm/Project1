@@ -7,7 +7,7 @@ L=read.csv('LaborForce.csv',header=T)
 
 Labor = ts(L$LNU01327662,start=1992,frequency=12)
 
-autoplot(Labor,main="Real Median US House Prices",ylab="USD (2012)",xlab="Year")
+autoplot(Labor,main="US Labor Force Participation Rate",ylab="Percent",xlab="Year")
 
 acf(Labor)
 pacf(Labor)

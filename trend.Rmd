@@ -119,6 +119,12 @@ model31=dynlm(Labor~t+
                 cos(4*pi*t/15.3)+sin(4*pi*t/15.3))
 plot31=ts(predict(model31),start=1992,frequency=12)
 autoplot(plot31) + autolayer(Labor)
+
+model32=dynlm(Labor~t+
+                t*cos(2*pi*t/13)+t*sin(2*pi*t/13)+
+                cos(4*pi*t/13)+sin(4*pi*t/13))
+plot32=ts(predict(model32),start=1992,frequency=12)
+autoplot(plot32) + autolayer(Labor)
 ```
 
 
@@ -135,11 +141,12 @@ summary(model28)
 summary(model29)
 summary(model30)
 summary(model31)
+summary(model32)
 
 AIC(model1,model2,model3,model4,model5,model6,model7,model8,
-    model28,model29,model30,model31)
+    model28,model29,model30,model31,model32)
 BIC(model1,model2,model3,model4,model5,model6,model7,model8,
-    model28,model29,model30,model31)
+    model28,model29,model30,model31,model32)
 ```
 
 ```{r}
@@ -156,5 +163,38 @@ checkresiduals(model28)
 checkresiduals(model29)
 checkresiduals(model30)
 checkresiduals(model31)
+checkresiduals(model32)
+```
+
+
+```{r}
+predict(model1,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model2,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model3,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model4,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model5,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model6,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model7,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model8,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+
+predict(model28,newdata=data.frame(t_adj=seq(0,2040-1992,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model29,newdata=data.frame(t_adj=seq(0,2040-1992,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model30,newdata=data.frame(t_adj=seq(0,2040-1992,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+
+predict(model31,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
+predict(model32,newdata=data.frame(t=seq(1992,2040,1/12))) %>%
+  ts(start=1992,freq=12) %>% autoplot + autolayer(Labor)
 ```
 

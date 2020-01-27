@@ -63,11 +63,15 @@ autoplot(plot6) + autolayer(Labor)
 model7=dynlm(Labor~t+t*cos(2*pi*t/15)+t*sin(2*pi*t/15))
 plot7=ts(predict(model7),start=1992,frequency=12)
 autoplot(plot7) + autolayer(Labor)
+
+model8=dynlm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
+plot8=ts(predict(model8),start=1992,frequency=12)
+autoplot(plot8) + autolayer(Labor)
 ```
 
 ```{r}
 t_adj=t-1992
-model8=nls(Labor~a+b*t_adj+
+model28=nls(Labor~a+b*t_adj+
              c*cos(2*pi*t_adj/p)+d*sin(2*pi*t_adj/p)+
              e*t_adj*cos(2*pi*t_adj/p)+f*t_adj*sin(2*pi*t_adj/p)+
              g*cos(4*pi*t_adj/p)+h*sin(4*pi*t_adj/p)+
@@ -77,13 +81,13 @@ model8=nls(Labor~a+b*t_adj+
                             e=0.031317,f=-0.035067,
                             g=0.01,h=0.01,
                             i=0.01,j=0.01))
-plot8=ts(predict(model8),start=1992,frequency=12)
-autoplot(plot8) + autolayer(Labor)
+plot28=ts(predict(model28),start=1992,frequency=12)
+autoplot(plot28) + autolayer(Labor)
 ```
 
 ```{r}
 t_adj=t-1992
-model9=nls(Labor~a+b*t_adj+
+model29=nls(Labor~a+b*t_adj+
              c*cos(2*pi*t_adj/p)+d*sin(2*pi*t_adj/p)+
              e*t_adj*cos(2*pi*t_adj/p)+f*t_adj*sin(2*pi*t_adj/p)+
              g*cos(4*pi*t_adj/p)+h*sin(4*pi*t_adj/p),
@@ -91,13 +95,13 @@ model9=nls(Labor~a+b*t_adj+
                             c=-0.0934,d=0.28,
                             e=0.031317,f=-0.035067,
                             g=0.01,h=0.01))
-plot9=ts(predict(model9),start=1992,frequency=12)
-autoplot(plot9) + autolayer(Labor)
+plot29=ts(predict(model29),start=1992,frequency=12)
+autoplot(plot29) + autolayer(Labor)
 ```
 
 ```{r}
 t_adj=t-1992
-model10=nls(Labor~a+b*t_adj+
+model30=nls(Labor~a+b*t_adj+
              c*cos(2*pi*t_adj/p)+
              e*t_adj*cos(2*pi*t_adj/p)+
              g*cos(4*pi*t_adj/p),
@@ -105,16 +109,16 @@ model10=nls(Labor~a+b*t_adj+
                             c=-0.0934,
                             e=0.031317,
                             g=0.01))
-plot10=ts(predict(model10),start=1992,frequency=12)
-autoplot(plot10) + autolayer(Labor)
+plot30=ts(predict(model30),start=1992,frequency=12)
+autoplot(plot30) + autolayer(Labor)
 ```
 
 ```{r}
-model11=dynlm(Labor~t+
+model31=dynlm(Labor~t+
                 t*cos(2*pi*t/15.3)+t*sin(2*pi*t/15.3)+
                 cos(4*pi*t/15.3)+sin(4*pi*t/15.3))
-plot11=ts(predict(model11),start=1992,frequency=12)
-autoplot(plot11) + autolayer(Labor)
+plot31=ts(predict(model31),start=1992,frequency=12)
+autoplot(plot31) + autolayer(Labor)
 ```
 
 
@@ -127,14 +131,15 @@ summary(model5)
 summary(model6)
 summary(model7)
 summary(model8)
-summary(model9)
-summary(model10)
-summary(model11)
+summary(model28)
+summary(model29)
+summary(model30)
+summary(model31)
 
-AIC(model1,model2,model3,model4,model5,model6,model7,
-    model8,model9,model10,model11)
-BIC(model1,model2,model3,model4,model5,model6,model7,
-    model8,model9,model10,model11)
+AIC(model1,model2,model3,model4,model5,model6,model7,model8,
+    model28,model29,model30,model31)
+BIC(model1,model2,model3,model4,model5,model6,model7,model8,
+    model28,model29,model30,model31)
 ```
 
 ```{r}
@@ -145,10 +150,11 @@ checkresiduals(model4)
 checkresiduals(model5)
 checkresiduals(model6)
 checkresiduals(model7)
-
 checkresiduals(model8)
-checkresiduals(model9)
-checkresiduals(model10)
-checkresiduals(model11)
+
+checkresiduals(model28)
+checkresiduals(model29)
+checkresiduals(model30)
+checkresiduals(model31)
 ```
 

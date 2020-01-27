@@ -43,6 +43,10 @@ model7=dynlm(Labor~t+t*cos(2*pi*t/15)+t*sin(2*pi*t/15))
 plot7=ts(predict(model7),start=1992,frequency=12)
 autoplot(plot7) + autolayer(Labor)
 
+model8=dynlm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
+plot8=ts(predict(model8),start=1992,frequency=12)
+autoplot(plot8) + autolayer(Labor)
+
 
 summary(model1)
 summary(model2)
@@ -51,9 +55,10 @@ summary(model4)
 summary(model5)
 summary(model6)
 summary(model7)
+summary(model8)
 
-AIC(model1,model2,model3,model4,model5,model6,model7)
-BIC(model1,model2,model3,model4,model5,model6,model7)
+AIC(model1,model2,model3,model4,model5,model6,model7,model8)
+BIC(model1,model2,model3,model4,model5,model6,model7,model8)
 
 checkresiduals(model1)
 checkresiduals(model2)
@@ -62,3 +67,4 @@ checkresiduals(model4)
 checkresiduals(model5)
 checkresiduals(model6)
 checkresiduals(model7)
+checkresiduals(model8)

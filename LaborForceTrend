@@ -9,10 +9,6 @@ Labor = ts(L$LNU01327662,start=1992,frequency=12)
 
 autoplot(Labor,main="Real Median US House Prices",ylab="USD (2012)",xlab="Year")
 
-
-#(b) Does your plot in (a) suggest that the data are covariance stationary? Explain your answer.
-#nah brah
-#(c) Plot and discuss the ACF and PACF of your data.
 acf(Labor)
 pacf(Labor)
 t = time(Labor)
@@ -46,7 +42,6 @@ autoplot(plot6) + autolayer(Labor)
 model7=dynlm(Labor~t+t*cos(2*pi*t/15)+t*sin(2*pi*t/15))
 plot7=ts(predict(model7),start=1992,frequency=12)
 autoplot(plot7) + autolayer(Labor)
-
 
 
 summary(model1)

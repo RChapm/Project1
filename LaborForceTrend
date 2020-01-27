@@ -1,70 +1,58 @@
+**(a) Show a time-series plot of your data.**
+```{r}
 library(ggplot2)
 library(forecast)
 library(dynlm)
 library(fpp2)
+library(MASS)
 
 L=read.csv('LaborForce.csv',header=T)
 
 Labor = ts(L$LNU01327662,start=1992,frequency=12)
 
 autoplot(Labor,main="US Labor Force Participation Rate",ylab="Percent",xlab="Year")
+```
+**(b) Does your plot in (a) suggest that the data are covariance stationary? Explain your answer**
 
+The plot does not suggest that the data are covariance stationary. The mean of the data shows a clear decrease over time and this violates the requirements for both weak and strong stationarity.
+
+**(c) Plot and discuss the ACF and PACF of your data.**
+```{r}
 acf(Labor)
 pacf(Labor)
+```
+The ACF suggests that the different time intervals show very high correlation that decreases very slowly across greater spans of time. The PACF suggests that the direct correlation (without intermediate time steps) between time intervals is statistically insignificant aside from time lags of 1 month and 13 months, with slight indications of correlation at 4, 10, and 26 months. ELABORATE MORE POSSIBLY 
+
+**(d) Fit a linear and nonlinear (e.g., polynomial, exponential, quadratic + periodic, etc.) model to your series. In one window, show both figures of the original times series plot with the respective fit.**
+```{r}
 t = time(Labor)
 
 model1=dynlm(Labor~t)
 plot1=ts(predict(model1),start=1992,frequency=12)
-autoplot(plot1)+autolayer(Labor)
-
 
 model2=dynlm(Labor~t+sin(2*pi*t/13)+cos(2*pi*t/13))
 plot2=ts(predict(model2),start=1992,frequency=12)
-autoplot(plot2) + autolayer(Labor)
 
 model3=dynlm(Labor~t+I(t*cos(2*pi*t/15))+I(t*sin(2*pi*t/15)))
 plot3=ts(predict(model3),start=1992,frequency=12)
-autoplot(plot3) + autolayer(Labor)
-
 
 model4=dynlm(Labor~t+sin(2*pi*t/13)+t*cos(2*pi*t/13))
 plot4=ts(predict(model4),start=1992,frequency=12)
-autoplot(plot4) + autolayer(Labor)
 
 model5=dynlm(Labor~t+sin(2*pi*t/14)+t*cos(2*pi*t/14))
 plot5=ts(predict(model5),start=1992,frequency=12)
-autoplot(plot5) + autolayer(Labor)
 
 model6=dynlm(Labor~t+cos(2*pi*t/12))
 plot6=ts(predict(model6),start=1992,frequency=12)
-autoplot(plot6) + autolayer(Labor)
 
 model7=dynlm(Labor~t+t*cos(2*pi*t/15)+t*sin(2*pi*t/15))
 plot7=ts(predict(model7),start=1992,frequency=12)
-autoplot(plot7) + autolayer(Labor)
 
 model8=dynlm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
 plot8=ts(predict(model8),start=1992,frequency=12)
-autoplot(plot8) + autolayer(Labor)
-
-
-summary(model1)
-summary(model2)
-summary(model3)
-summary(model4)
-summary(model5)
-summary(model6)
-summary(model7)
-summary(model8)
 
 AIC(model1,model2,model3,model4,model5,model6,model7,model8)
 BIC(model1,model2,model3,model4,model5,model6,model7,model8)
 
-checkresiduals(model1)
-checkresiduals(model2)
-checkresiduals(model3)
-checkresiduals(model4)
-checkresiduals(model5)
-checkresiduals(model6)
-checkresiduals(model7)
-checkresiduals(model8)
+autoplot(Labor,series="Data")+autolayer(plot2,series="Linear+Periodic")+autolayer(plot8,series="Quadratic+Periodic")+scale_color_manual(values = c("gray", "blue","red"), breaks = c("Data", "Linear+Periodic", "Quadratic+Periodic"))
+```

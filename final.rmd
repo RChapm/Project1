@@ -1,0 +1,161 @@
+Introduction (describe the data, provide some background on the topic, etc.)
+
+The data for this project is
+
+
+**(a) Show a time-series plot of your data.**
+```{r}
+#importing relevant libraries
+library(ggplot2)
+library(forecast)
+library(dynlm)
+library(fpp2)
+library(MASS)
+
+#reading in the csv data file for labor force participation rate
+L=read.csv('LaborForce.csv',header=T)
+
+#creating a time series from the variable LNU01327662 with monthly frequency
+Labor = ts(L$LNU01327662,start=1992,frequency=12)
+
+#plotting the data
+autoplot(Labor,main="US Labor Force Participation Rate",ylab="Percent",xlab="Year")
+```
+
+**(b) Does your plot in (a) suggest that the data are covariance stationary? Explain your answer**
+
+The plot does not suggest that the data are covariance stationary. The mean of the data shows a clear decrease over time and this violates the requirements for both weak and strong stationarity.
+
+**(c) Plot and discuss the ACF and PACF of your data.**
+```{r}
+#computing the auto correlation and partial auto correlation functions of the data
+acf(Labor)
+pacf(Labor)
+```
+
+The ACF suggests that the different time intervals show very high correlation that decreases very slowly across greater spans of time. The PACF suggests that the direct correlation (without intermediate time steps) between time intervals is generally statistically insignificant aside from time lags of 1 month and 13 months, with slight indications of correlation at 4, 10, and 26 months.
+
+**(d) Fit a linear and nonlinear (e.g., polynomial, exponential, quadratic + periodic, etc.) model to your series. In one window, show both figures of the original times series plot with the respective fit.**
+```{r}
+#creating a time variable
+t = time(Labor)
+
+#   MODEL 1: Linear Model
+model1=dynlm(Labor~t)
+plot1=ts(predict(model1),start=1992,frequency=12)
+
+#   MODEL 2: Linear + Periodic Model with 13 month cycle
+model2=dynlm(Labor~t+sin(2*pi*t/13)+cos(2*pi*t/13))
+plot2=ts(predict(model2),start=1992,frequency=12)
+
+#   MODEL 3: Linear + Periodic Model with cyclical behavior changing over time
+model3=dynlm(Labor~t+I(t*cos(2*pi*t/15))+I(t*sin(2*pi*t/15)))
+plot3=ts(predict(model3),start=1992,frequency=12)
+
+#   MODEL 4: Linear + Periodic Model with 13 month cycle + an interaction between time and the cyclical behavior for cosine only
+model4=dynlm(Labor~t+sin(2*pi*t/13)+t*cos(2*pi*t/13))
+plot4=ts(predict(model4),start=1992,frequency=12)
+
+#   MODEL 5: Linear + Periodic Model with 14 month cycle + an interaction between time and the cyclical behavior for cosine only
+model5=dynlm(Labor~t+sin(2*pi*t/14)+t*cos(2*pi*t/14))
+plot5=ts(predict(model5),start=1992,frequency=12)
+
+#   MODEL 6: Linear + Periodic Model with 12 month cycle
+model6=dynlm(Labor~t+cos(2*pi*t/12))
+plot6=ts(predict(model6),start=1992,frequency=12)
+
+#   MODEL 7: Linear + Periodic Model with 15 month cycle + an interaction between time and the cyclical behavior
+model7=dynlm(Labor~t+t*cos(2*pi*t/15)+t*sin(2*pi*t/15))
+plot7=ts(predict(model7),start=1992,frequency=12)
+
+#   MODEL 8: Quadratic + Periodic Model with 13 month cycle + an interaction between time and the cyclical behavior for cosine only
+model8=dynlm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
+plot8=ts(predict(model8),start=1992,frequency=12)
+
+# Using the AIC and BIC to determine which two models we will investigate further. Model 7 and 8 have the lowest residuals, so we will proceed with these.
+AIC(model1,model2,model3,model4,model5,model6,model7,model8)
+BIC(model1,model2,model3,model4,model5,model6,model7,model8)
+
+#plotting the original data, model 7, and model 8
+autoplot(Labor,series="Data")+autolayer(plot7,series="Linear+Periodic")+autolayer(plot8,series="Quadratic+Periodic")+scale_color_manual(values = c("gray", "blue","red"), breaks = c("Data", "Linear+Periodic", "Quadratic+Periodic"))
+```
+
+In order to determine the optimal period length for each of the aforementioned 8 models, we experimented with different period lengths between 12 and 16 years until we found a value that minimized AIC and BIC for that particular model. We also experimented with the nature of the interaction between t and sine and cosine. After creating multiple iterations of each format, we removed many with statistically insignificant variables, very predictable residuals, and high AIC and BIC values.
+
+**(e) For each model, plot the respective residuals vs. fitted values and discuss your observations.**
+```{r}
+#plotting the fitted values vs residuals for model7, along with lowess smoother
+plot(model7$fit,model7$res,col="skyblue3",pch=20,xlab="Predicted Response",ylab="Residuals",main="Residuals vs. Predicted Response",cex.axis=0.8,cex.main=0.9)
+abline(h=0,lwd=2,col="red")
+lines(lowess(model7$fit,model7$res),lwd=1.5) 
+abline(v=6e5,col="red",lty=2,lwd=1.5)
+legend(0,45,c(expression(y[obs]==y[pred]), "Lowess Smoother"), fill =c("red", "black"),cex=0.6)
+
+#plotting the fitted values vs resiudals for model 8, along with lowess smoother
+plot(model8$fit,model8$res,col="skyblue3",pch=20,xlab="Predicted Response",ylab="Residuals",main="Residuals vs. Predicted Response",cex.axis=0.8,cex.main=0.9)
+abline(h=0,lwd=2,col="red")
+lines(lowess(model8$fit,model8$res),lwd=1.5) 
+abline(v=6e5,col="red",lty=2,lwd=1.5)
+legend(0,45,c(expression(y[obs]==y[pred]), "Lowess Smoother"), fill =c("red", "black"),cex=0.6)
+```
+
+**(f) For each model, plot a histogram of the residuals and discuss your observations.**
+```{r}
+#plotting histogram of resiudals for model 7, along with normal distribution and density lines
+truehist(model7$res,col="skyblue3",xlab="Residuals",ylab="Fraction",main="Histogram of Residuals")
+xr=rnorm(800000,mean(model7$res),sd(model7$res))
+lines(density(xr),col="black",lwd=2)
+lines(density(model7$res),col="red",lwd=2)
+legend(3.5,0.04,c("Density","Normal Distr."),fill=c("red","black"),bty='n')
+
+#plotting histogram of resiudals for model 8, along with normal distribution and density lines
+truehist(model8$res,col="skyblue3",xlab="Residuals",ylab="Fraction",main="Histogram of Residuals")
+xr=rnorm(800000,mean(model8$res),sd(model8$res))
+lines(density(xr),col="black",lwd=2)
+lines(density(model8$res),col="red",lwd=2)
+legend(3.5,0.04,c("Density","Normal Distr."),fill=c("red","black"),bty='n')
+```
+
+The residuals for both models appear close to normal distributions with modes of approximately 0-0.2 for both. There appears to be many under predictions of small magnitude and a few over predictions of large magnitude. This is likely a result of the seasonal behavior of the data which appears to exhibit short periods far below the trend line followed by longer periods just above the trend line.
+
+**(g) For each model, discuss the associated diagnostic statistics (R2, t−distribution, F−distribution, etc.)**
+```{r}
+#computing summary statistics for our two chosen modles
+summary(model7)
+summary(model8)
+```
+
+R-Squared: The adjusted R-squared of model7 is .9726 while the adjusted R-squared of model8 is .9729. This indicates that both models offer strong predictive accuracy for the data but model8 is superior.
+T-distribution: The absolute value of the t-values for both regressions' coefficients are all greater than 2, indicating they offer statistical significance.
+F-distribution and P-Value: The F-statistics and P-values support our findings from the t-values. The F-statistics for model7 and model8 are respectively 2383 and 2409, both of which imply the model offers significant explanatory behavior. The p-values for the coefficients in each model are all significantly statistically different from 0. The p-value for both models as a whole are 2.2e-16 which indicates again that the models offer significant explanatory ability.
+
+
+**(h) Select a trend model using AIC and one using BIC (show the values obtained from each criterion). Do the selected models agree?**
+```{r}
+#Again, computing the AIC and BIC for these two models.
+AIC(model7,model8)
+BIC(model7,model8)
+```
+
+The AIC selects model8 and the BIC selects model8 as it appears this model minimizes error even with a higher penalty for more explanatory variables. Due to the lower value of AIC and BIC for model8 this is the model we will use for the remainder of the project.
+
+**(i) Use your preferred model to forecast h-steps (at least 16) ahead. Your forecast should include the respective uncertainty prediction interval. Depending on your data, h will be in days, months, years, etc.**
+```{r}
+#forecasting the Labor Force Participation rate in 2022 (24 periods ahead)
+
+#creating a time series model so that we can use the forecast function
+model8ts=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
+
+#Creating the time of the forecast window
+newt=seq(2020,2022,1/12)
+
+#Creating the dataset to be forecast upon
+newdata=data.frame(newt,cos(2*pi*newt/13),sin(2*pi*newt/13))
+names(newdata)=c('t','cos(2*pi*t/13)','sin(2*pi*t/13)')
+
+#Plotting the forecast vs original data
+autoplot(Labor,series="Data")+autolayer(forecast(model8ts,newdata=newdata), series="Forecast")+autolayer(plot8,series="Trend") + scale_color_manual( values=c("gray","blue","red"), breaks=c("Data","forecast","Trend"))
+
+#outputtting the exact forecast values and prediction interval
+forecast(model8ts,newdata=newdata)
+```

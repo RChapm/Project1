@@ -1,7 +1,12 @@
-Introduction (describe the data, provide some background on the topic, etc.)
+
+
+## I. Introduction
 
 The data for this project is
 
+## II. Results
+
+### 1. Modeling and Forecasting Trend
 
 **(a) Show a time-series plot of your data.**
 ```{r}
@@ -159,3 +164,95 @@ autoplot(Labor,series="Data")+autolayer(forecast(model8ts,newdata=newdata), seri
 #outputtting the exact forecast values and prediction interval
 forecast(model8ts,newdata=newdata)
 ```
+
+```{r}
+library(stats)
+suppressPackageStartupMessages(
+  library(fpp2)
+)
+library(forecast)
+suppressPackageStartupMessages(
+  library(dynlm)
+)
+library(magrittr)
+suppressPackageStartupMessages(
+  library(tseries)
+)
+```
+
+```{r}
+L=read.csv('LaborForce.csv',header=T)
+Labor = ts(L$LNU01327662,start=1992,frequency=12)
+t = time(Labor)
+model8=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
+```
+
+### 2. Modeling and Forecasting Seasonality
+
+**(a) Construct and test (by looking at the diagnostic statistics) a model with a full set of seasonal dummies.**
+```{r}
+seasonal=tslm(Labor~trend+season)
+summary(seasonal)
+```
+From the test statistics, at 5% level, the intercept, the linear trend, season2, season3, season6, season7. The $R^2_{\mathrm{adj}}$ is 0.9682, indicating a fairly good fit for this simple model. The $p$-value for the $F$ test is lower than 5%, so we reject the null hypothesis that the there is no seasonality or trend at 5% level.
+
+**(b) Plot the estimated seasonal factors and interpret your plot.**
+
+```{r}
+seasfactors=seasonal$coefficients[2:13]
+names(seasfactors)[[1]]='season1'
+seasfactors[[1]]=0
+seasfactors %>% ts(start=1) %>% 
+  autoplot(xlab='Month',ylab='Seasonal Factors, (% points)',
+           main='Additive Seasonal Factors (January=0%):\nCivilian Labor Force Participation Rate')
+```
+
+There is a relative increase in civilian labor force participation rate in sping and fall with respect to January, and there is a relative decrease in civilian labor force participation rate in summer with respect to January. The suspected reason for the increase is that spring and fall are the major recruitment periods for firms.
+
+**(c) In order to improve your model, add the trend model from problem 1 to your seasonal model. We will refer to this model as the full model. For the full model, plot the respective residuals vs. fitted values and discuss your observations.**
+
+```{r}
+full=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13)+season)
+plot(full$fit,full$res,cex=0.5,pch=20,col='blue',
+     xlab='Fitted values',ylab='Residuals',
+     main='Residuals vs. Fitted Values for Full Model',
+     ylim=c(-2,2))
+lines(lowess(full$fit,full$res),lwd=2)
+legend(78,2, c("Lowess Smoother"), fill =c("black"),cex=1,bty="y")
+```
+
+At all ranges of fitted values, the residuals look evenly and randomaly distributed on both side of the zero line. The lowess smoother is nearly indistinguishable from the zero line. This means that our model did not miss any pattern in the data, and the error is homoskedastic.
+
+**(d) Interpret the respective summary statistics including the error metrics of your full model.**
+
+```{r}
+summary(full)
+AIC(full)
+BIC(full)
+```
+
+Out of all the explanatory variables, only the seasonal dummies for season5, season9, season10, season11, season12 are not significant. This means that these seasons do not contribute much to explaining the seasonal variation of the data. The aic and bic values are lower than any of the previous models, meaning that including seasonal effects is crucial to explaining the variations of the data. The $R^2_{\mathrm{adj}}$ increased from the seasonal plus linear trend model, indicating that the trend from problem 1 fits the data better.
+
+
+**(e) Use the full model to forecast h-steps (at least 16) ahead. Your forecast should include the respective prediction interval.**
+```{r}
+newt=seq(2020,2025,1/12)
+newdata=data.frame(newt,cos(2*pi*newt/13),sin(2*pi*newt/13))
+names(newdata)=c('t','cos(2 * pi * t/13)','sin(2 * pi * t/13)')
+autoplot(Labor,col='grey',
+         main='Full Model, Fitted + Forecast:\nCivilian Labor Force Participation Rate')+
+  xlab('Year')+ylab('Participation, (%)')+
+  autolayer(full$fitted.values,series='Fitted Values')+
+  autolayer(forecast(full,newdata=newdata),series='Forecast')+
+  scale_color_manual(values=c('red','blue'),
+                     breaks=c('Fitted Values','Forecast'))
+```
+
+The figure above shows the forecast of the full model, with an $h=60$ point and interval forecasts. The grey series is the observed data. The lighter shade corresponds to 95% forecast interval and the darker blue shade corresponds to 80% forecast interval.
+
+## III. (5%) Conclusions and Future Work 
+state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved
+## IV. (5%) References (
+include the source of your data and any other resources
+## V. (10%) R Source code. 
+Your code needs to include proper comments to help e.g., a non-R expert understand and run your code. If you do not submit your code, you will not receive credit for the assignment.

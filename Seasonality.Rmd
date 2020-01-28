@@ -28,7 +28,7 @@ t = time(Labor)
 model8=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
 ```
 
-# 2. Modeling and Forecasting Seasonality (6% each)
+# 2. Modeling and Forecasting Seasonality
 
 **(a) Construct and test (by looking at the diagnostic statistics) a model with a full set of seasonal dummies. **
 
@@ -106,10 +106,12 @@ Out of all the explanatory variables, only the seasonal dummies for season5, sea
 Given the full model which seems to fit existing data well, we attempt to extract forecasts 60 periods ahead ($h=60$), in order to evaluate the degree to which the forecasted values for civilian labor force participation rate is probable.
 
 ```{r}
+# construct new data to base forecast on
 newt=seq(2020,2025,1/12)
 newdata=data.frame(newt,cos(2*pi*newt/13),sin(2*pi*newt/13))
 names(newdata)=c('t','cos(2 * pi * t/13)','sin(2 * pi * t/13)')
 
+# embed forecast in plots
 autoplot(Labor,col='grey',
          main='Full Model, Fitted + Forecast:\nCivilian Labor Force Participation Rate')+
   xlab('Year')+ylab('Participation, (%)')+
@@ -123,36 +125,29 @@ The figure above shows the forecast of the full model, with an $h=60$ point and 
 
 We must note that the prediction interval which `forecast` produces must be taken with a grain of salt. This prediction interval does not take into account the error introduced when estimating the model parameters. Adding to that, the error in the cycle period is unaccountable given that we have dictated the period to be 13 based on trial and error. The true prediction interval should be larger.
 
-# III. (5%) Conclusions and Future Work (state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved).
+## III. Conclusions and Future Work (state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved).
 
 To model the evolution of the civilian labor force participation rate (Bachelor's degree and higher, 25 years and over), our final chosen model is $$LABOR_t=\beta_0+\beta_1TIME_t+\beta_2TIME^2_t+(A_0+A_1TIME_t)\cos\left(\frac{2\pi}{13}TIME_t\right)+B_0\sin\left(\frac{2\pi}{13}TIME_t\right)+\sum_{m=2}^{12}\delta_mMONTH_{mt}$$
 The first three terms in the model account for a quatratic trend. The next two terms account for a amplitude-varying 13 year cycle. The last term accounts for seasonality. 
 
-The regression  produced a quadratic trend which concaves down. It suggests that the decrease in the labor force participation rate is accelerating. The amplitude of the oscillation is slowly increasing (0.01-0.02 percentage points per year). The seasonal part suggests that the labor force participation rate is lower than average in summer and higher than average in spring and fall.
+The result of the full model regression is as follows:
 
-Based on these observations, the model forecasts that the decrease in labor force participation rate will continue to speed up. The 
+1. The regression  produced a quadratic trend which concaves down, suggesting that the decrease in the labor force participation rate is accelerating. This seems to be related to the recent advances in production technologies, whose potential to replace human labor continues to rise.
+2. The data is modulated by a ~13 year cycle, whose amplitude is slowly increasing (on the scale of 0.01-0.02 percentage points per year). This is possibly related to the expansions and recessions of the business cycle. The dynamics of the cycle seems destabilize as the quadratic trend rapidly throws it downward.
+3. The seasonal part of the model suggests that the labor force participation rate is lower than average in summer and higher than average in spring and fall, which could be related to how businesses manages recruitment and cuts logistically.
 
-comunemaccelerating negetive trend
-Less incentive to work
-Less labor intensive industries.
-Extrapolate to 2150: no labor participation at all
+Based on these observations, the model forecasts that in the short run (5 years, $h=60$):
 
+1. The decrease in labor force participation rate will continue to speed up. Extrapolating onto a grander timescale, people could be less incentivized to provide labor, and there could be a shift towards less labor intensive industries.
+2. The recession part of the business cycle will dominate the short run contraction of the labor force participation rate.
+3. The seasonal variation will persist on top of the trend and cycle.
 
+**Future work:** There are several points where our model could improve:
+1. A lack of longtidutinal data: our model used civilian labor force participation rate from 1992 to 2019, some 28 years of data. If we could obtain the data from beyond 1992, we could verify whether the quadratic trend, the 13-year business cycle, and the roughly-constant seasonality are characteristics which persists in the long run, or they are themselves time-varying. With longer-term data, perhaps other trends and cycles are more appropriate.
+2. A lack of latitudinal data: our model used data from the U.S. only, and we only included the civilian labor force participation rate of the people who has Bachelor's degree and higher and are 25 years and over. If we obtained data from other subcategories of the population, and even other countries, we can verify whether or not the dynamics we see in our model is specific to the population and country.
+3. Seasonality assumed constant throughout the 28 years of data: This assumption is an artifact of the regression model we used. To verify whether this assumption is true and improve the model, it is advisable to perform seasonal decomposition with algorithms such as STL, X11, or SEATS.
+4. Residuals assumed to be independent: we have not checked for serial correlation in the residuals of the full model. If there were serial correlation, an ARMA model would perhaps be appropriate.
 
-Other nations
+## IV. References
 
-More generalized trend
-verify the cyclical trend over different countries
-Extend the range of data, years
-
-Look at different subset of population/ subsets of data
-
-Allowing for change in seasonality by using stl, X11, SEATS
-
-
-Doing an AR for residuals
-
-
-# IV. (5%) References (include the source of your data and any other resources).
-
-Civilian Labor Force Participation Rate: Bachelor's Degree and Higher, 25 years and over (LNU01327662), **FRED Economic Data**, accessed Jan 27, 2020, available at: https://fred.stlouisfed.org/series/LNU01327662
+Civilian Labor Force Participation Rate: Bachelor's Degree and Higher, 25 years and over (LNU01327662), *FRED Economic Data*, accessed Jan 27, 2020, available at: https://fred.stlouisfed.org/series/LNU01327662

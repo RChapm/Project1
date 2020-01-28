@@ -95,3 +95,36 @@ autoplot(Labor,col='grey',
 ```
 
 The figure above shows the forecast of the full model, with an $h=60$ point and interval forecasts. The grey series is the observed data. The lighter shade corresponds to 95% forecast interval and the darker blue shade corresponds to 80% forecast interval.
+
+# III. (5%) Conclusions and Future Work (state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved).
+
+To model the evolution of the civilian labor force participation rate (Bachelor's degree and higher, 25 years and over), our final chosen model is $$LABOR_t=\beta_0+\beta_1TIME_t+\beta_2TIME^2_t+(A_0+A_1TIME_t)\cos\left(\frac{2\pi}{13}TIME_t\right)+B_0\sin\left(\frac{2\pi}{13}TIME_t\right)+\sum_{m=2}^{12}\delta_mMONTH_{mt}$$
+
+According to this model, the time evolution of civilian labor force participation rate is composed of a quatratic trend, an amplitude-varying cycle, and seasonality. The quatratic trend suggest that the the labor force participation rate is decreasing and accelerating. The cycle has a 13 year period. The amplitude of the oscillation is slowly varying (-0.02% per year). The seasonal part suggests that the labor force participation rate is lower than average in summer and higher than average in spring and fall.
+
+Based on these observations, the model forecasts that the decrease in labor force participation rate will continue to speed up. The 
+
+comunemaccelerating negetive trend
+Less incentive to work
+Less labor intensive industries.
+Extrapolate to 2150: no labor participation at all
+
+
+
+Other nations
+
+More generalized trend
+verify the cyclical trend over different countries
+Extend the range of data, years
+
+Look at different subset of population/ subsets of data
+
+Allowing for change in seasonality by using stl, X11, SEATS
+
+
+Doing an AR for residuals
+
+
+# IV. (5%) References (include the source of your data and any other resources).
+
+Civilian Labor Force Participation Rate: Bachelor's Degree and Higher, 25 years and over (LNU01327662), **FRED Economic Data**, accessed Jan 27, 2020, available at: https://fred.stlouisfed.org/series/LNU01327662

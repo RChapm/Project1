@@ -32,54 +32,79 @@ model8=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13))
 
 **(a) Construct and test (by looking at the diagnostic statistics) a model with a full set of seasonal dummies. **
 
+To estimate the seasoanl effect, we use a set of 11 seasonal dummies to indicate whether a particular measurement occured in February, March, etc. It is important to isolate the trend component to the seasonality estimation does not become biased.
+
 ```{r}
+# regress Labor on linear trend plus full seasonal dummies
 seasonal=tslm(Labor~trend+season)
+
+# print out summary of model
 summary(seasonal)
 ```
 
-From the test statistics, at 5% level, the intercept, the linear trend, season2, season3, season6, season7. The $R^2_{\mathrm{adj}}$ is 0.9682, indicating a fairly good fit for this simple model. The $p$-value for the $F$ test is lower than 5%, so we reject the null hypothesis that the there is no seasonality or trend at 5% level.
+From the test statistics, at 5% level, the intercept, the linear trend, season2, season3, season6, season7. The other seasonal coefficients are not statistically significant from zero. The $R^2_{\mathrm{adj}}$ is 0.9682, indicating a fairly good fit for this simple model. The $p$-value for the $F$ test is lower than 5%, so we reject the null hypothesis that the there is no seasonality or trend at 5% level.
 
 **(b) Plot the estimated seasonal factors and interpret your plot.**
 
+The seasonal effect can be visualized by plotting all the seasonal coefficients. The seasonal coefficients indicate how much on average is the civilian labor force participation rate in a given month is different from that of January. Since our 11 seasonal dummies does not include January (otherwise there would be a collinearity issue and regression would fail), we manually set the coefficient of January to be zero. 
+
 ```{r}
+# extract seasonal coefs from model
 seasfactors=seasonal$coefficients[2:13]
-names(seasfactors)[[1]]='season1'
+
+# manually set coef for January
+names(seasfactors)[[1]]='season1' 
 seasfactors[[1]]=0
+
+# convert to ts object and autoplot
 seasfactors %>% ts(start=1) %>% 
   autoplot(xlab='Month',ylab='Seasonal Factors, (% points)',
            main='Additive Seasonal Factors (January=0%):\nCivilian Labor Force Participation Rate')
 ```
 
-There is a relative increase in civilian labor force participation rate in sping and fall with respect to January, and there is a relative decrease in civilian labor force participation rate in summer with respect to January. The suspected reason for the increase is that spring and fall are the major recruitment periods for firms.
+There is a relative increase in civilian labor force participation rate in spring and fall with respect to January, and there is a relative decrease in civilian labor force participation rate in summer with respect to January. The suspected reason for the increase is that spring and fall are the major recruitment periods for firms.
 
 **(c) In order to improve your model, add the trend model from problem 1 to your seasonal model. We will refer to this model as the full model. For the full model, plot the respective residuals vs. fitted values and discuss your observations.**
 
+There are flaws in using a linear trend when we regresses for the seasonal factors: a linear trend just doesn't fit the data too well. Here we will use the smooth trend which we selected from the previous problem, together with the full set of seasonal dummies, to account for the variations in data. This will hopefully be an improvement to both the estimation of the seasonal factors and the estimation of a full model.
+
 ```{r}
+# regress model on more sophisticated trend component and seasonal dummies
 full=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13)+season)
 
-
+# plot the residuals versus the fitted
 plot(full$fit,full$res,cex=0.5,pch=20,col='blue',
      xlab='Fitted values',ylab='Residuals',
      main='Residuals vs. Fitted Values for Full Model',
      ylim=c(-2,2))
+
+# plot the lowess smoother curve on top of the residuals
 lines(lowess(full$fit,full$res),lwd=2)
+
+# create a legend for the lowess smoother
 legend(78,2, c("Lowess Smoother"), fill =c("black"),cex=1,bty="y")
 ```
 
-At all ranges of fitted values, the residuals look evenly and randomaly distributed on both side of the zero line. The lowess smoother is nearly indistinguishable from the zero line. This means that our model did not miss any pattern in the data, and the error is homoskedastic.
+At all ranges of fitted values, the residuals look evenly and randomaly distributed on both side of the zero line. The lowess smoother is nearly indistinguishable from the zero line. This means that our model did not miss any pattern in the data. The error looks like it has constant variance, which means we need not worry about heteroskedasticity in the regression process.
 
 **(d) Interpret the respective summary statistics including the error metrics of your full model.**
 
+To evaluate the full model, we look at the statistics form the summary.
+
 ```{r}
+# print the summary, aic, and bic
 summary(full)
 AIC(full)
 BIC(full)
 ```
 
-Out of all the explanatory variables, only the seasonal dummies for season5, season9, season10, season11, season12 are not significant. This means that these seasons do not contribute much to explaining the seasonal variation of the data. The aic and bic values are lower than any of the previous models, meaning that including seasonal effects is crucial to explaining the variations of the data. The $R^2_{\mathrm{adj}}$ increased from the seasonal plus linear trend model, indicating that the trend from problem 1 fits the data better.
+Out of all the explanatory variables, only the seasonal dummies for season5, season9, season10, season11, season12 are not significant at 5% level. This means that these seasons do not contribute much to explaining the seasonal variation of the data. The aic and bic values are lower than any of the previous models, meaning that including seasonal effects is crucial to explaining the variations of the data. The $R^2_{\mathrm{adj}}$ increased from the seasonal plus linear trend model, indicating that the trend from problem 1 fits the data better than a naive linear trend.
 
 
 **(e) Use the full model to forecast h-steps (at least 16) ahead. Your forecast should include the respective prediction interval.**
+
+Given the full model which seems to fit existing data well, we attempt to extract forecasts 60 periods ahead ($h=60$), in order to evaluate the degree to which the forecasted values for civilian labor force participation rate is probable.
+
 ```{r}
 newt=seq(2020,2025,1/12)
 newdata=data.frame(newt,cos(2*pi*newt/13),sin(2*pi*newt/13))
@@ -94,13 +119,16 @@ autoplot(Labor,col='grey',
                      breaks=c('Fitted Values','Forecast'))
 ```
 
-The figure above shows the forecast of the full model, with an $h=60$ point and interval forecasts. The grey series is the observed data. The lighter shade corresponds to 95% forecast interval and the darker blue shade corresponds to 80% forecast interval.
+The figure above shows the forecast of the full model, with an $h=60$ point and interval forecasts. The grey series is the observed data. The lighter shade corresponds to 95% forecast interval and the darker blue shade corresponds to 80% forecast interval. Notable features of the forecast: visually it seems to be a natrual extension to the data. The downward curviness is a result of the estimated cycle. Seasonality is cleary present in the forecasts. The size of the prediction interval sees to be in agreement with the amount that actual data (grey) deviates from the fitted values.
+
+We must note that the prediction interval which `forecast` produces must be taken with a grain of salt. This prediction interval does not take into account the error introduced when estimating the model parameters. Adding to that, the error in the cycle period is unaccountable given that we have dictated the period to be 13 based on trial and error. The true prediction interval should be larger.
 
 # III. (5%) Conclusions and Future Work (state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved).
 
 To model the evolution of the civilian labor force participation rate (Bachelor's degree and higher, 25 years and over), our final chosen model is $$LABOR_t=\beta_0+\beta_1TIME_t+\beta_2TIME^2_t+(A_0+A_1TIME_t)\cos\left(\frac{2\pi}{13}TIME_t\right)+B_0\sin\left(\frac{2\pi}{13}TIME_t\right)+\sum_{m=2}^{12}\delta_mMONTH_{mt}$$
+The first three terms in the model account for a quatratic trend. The next two terms account for a amplitude-varying 13 year cycle. The last term accounts for seasonality. 
 
-According to this model, the time evolution of civilian labor force participation rate is composed of a quatratic trend, an amplitude-varying cycle, and seasonality. The quatratic trend suggest that the the labor force participation rate is decreasing and accelerating. The cycle has a 13 year period. The amplitude of the oscillation is slowly varying (-0.02% per year). The seasonal part suggests that the labor force participation rate is lower than average in summer and higher than average in spring and fall.
+The regression  produced a quadratic trend which concaves down. It suggests that the decrease in the labor force participation rate is accelerating. The amplitude of the oscillation is slowly increasing (0.01-0.02 percentage points per year). The seasonal part suggests that the labor force participation rate is lower than average in summer and higher than average in spring and fall.
 
 Based on these observations, the model forecasts that the decrease in labor force participation rate will continue to speed up. The 
 

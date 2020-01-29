@@ -15,16 +15,16 @@ output: html_document
 ### 1. Modeling and Forecasting Trend
 
 **(a) Show a time-series plot of your data.**
-```{r}
+```{r message=FALSE}
 #importing relevant libraries
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(forecast))
-suppressPackageStartupMessages(library(dynlm))
-suppressPackageStartupMessages(library(fpp2))
-suppressPackageStartupMessages(library(MASS))
-suppressPackageStartupMessages(library(stats))
-suppressPackageStartupMessages(library(magrittr))
-suppressPackageStartupMessages(library(tseries))
+library(ggplot2)
+library(forecast)
+library(dynlm)
+library(fpp2)
+library(MASS)
+library(stats)
+library(magrittr)
+library(tseries)
 #reading in the csv data file for labor force participation rate
 L=read.csv('LaborForce.csv',header=T)
 #creating a time series from the variable LNU01327662 with monthly frequency
@@ -170,9 +170,6 @@ autoplot(Labor,main = "Model 8, Fitted Trend + Forecast:\nCivilian Labor Force P
 ```
 
 The figure above shows the forecast of the full model, with an $h=60$ point and interval forecasts. The grey series is the observed data. The lighter shade of blue corresponds to 95% forecast interval and the darker blue shade corresponds to 80% forecast interval.
-
-<!-- comment out repeated code -->
-<!-- model8=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13)) -->
 
 ### 2. Modeling and Forecasting Seasonality
 

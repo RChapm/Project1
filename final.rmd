@@ -45,7 +45,7 @@ acf(Labor)
 pacf(Labor)
 ```
 
-The ACF suggests that the different time intervals show very high contemporaneous correlation that decreases very slowly across greater spans of time. The PACF suggests that the direct correlation (without intermediate time steps) between time intervals is generally statistically insignificant aside from time lags of 1 month and 13 months, with slight indications of correlation at 4, 10, and 26 months.
+The ACF suggests that the different time intervals show very high correlation which decreases very slowly across greater spans of time. The PACF suggests that the direct correlation (without intermediate time steps) between time intervals is generally statistically insignificant aside from time lags of 1 month and 13 months, with slight indications of correlation at 4, 10, and 26 months.
 
 **(d) Fit a linear and nonlinear (e.g., polynomial, exponential, quadratic + periodic, etc.) model to your series. In one window, show both figures of the original times series plot with the respective fit.**
 

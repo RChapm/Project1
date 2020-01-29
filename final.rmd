@@ -7,7 +7,8 @@ output: html_document
 
 ## I. Introduction
 
-  The data for this project pertains to the labor force participation rate in the United States. The term "labor force participation rate" refers to the percentage of people who are considered part of the labor force out of the total population. In this data, the total population refers to civilians (those not encarcerated or in service) who are 25 years or older with at least a Bachelor's Degree. To be considered part of the "labor force" a person is either searching for employment or actively employed. The data for this project is taken directly from the Federal Reserve Economic Data (FRED) website. The data set was compiled from the Current Population Survey and is taken at monthly intervals from January 1992 to December 2019.
+  The data for this project pertains to the labor force participation rate in the United States. The term "labor force participation rate" refers to the percentage of people who are considered part of the labor force out of the total population. In this data, the total population refers to civilians (those not encarcerated or in service) who are 25 years or older with at least a Bachelor's Degree. To be considered part of the "labor force" a person is either searching for employment or actively employed. The data for this project is taken directly from the Federal Reserve Economic Data (FRED) website $^{[1]}$. The data set was compiled from the Current Population Survey and is taken at monthly intervals from January 1992 to December 2019.
+
   Labor force participation is an important metric for understanding the true state of unemployment in our economy. When unemployment numbers fall, this indicates a decrease in the number of people actively searching for jobs. But, those people no longer labeled "unemployed" might not have found employment, but rather might have stopped the search for employment altogether. This is why it is important to look at figures such as the labor force participation rate to determine if we have a declining labor force. Furthermore, we look here at the subset of the population 25 years and older and with a bachelors degree or higher intentionally. If the labor force participation decreases for those with a degree, this indicates that a decline in the labor force is not a result of simply untrained workers not being qualified for more technical jobs, but rather a potential true net loss of available jobs in the economy. Keeping all of this information in mind, we will now proceed to evaluate the exact nature of the movement in our labor force participation rate.
 
 ## II. Results
@@ -82,7 +83,7 @@ BIC(model1,model2,model3,model4,model5,model6,model7,model8)
 autoplot(Labor,series="Data")+autolayer(plot1,series="Linear")+autolayer(plot8,series="Quadratic+Periodic")+scale_color_manual(values = c("gray", "blue","red"), breaks = c("Data", "Linear", "Quadratic+Periodic"))
 ```
 
-In order to determine the optimal period length for each of the aforementioned 8 models, we experimented with different period lengths between 12 and 16 years until we found a value that minimized AIC and BIC for that particular model. We also experimented with the nature of the interaction between t and sine and cosine. After creating multiple iterations of each format, we removed many with statistically insignificant variables, very predictable residuals, and high AIC and BIC values. For the remainder of part I, we will use our most basic linear model (model 1) and our most accurate quadratic and periodic model (model 8).
+In order to determine the optimal period length for each of the aforementioned 8 models, we experimented with different period lengths between 12 and 16 years until we found a value that minimized AIC and BIC for that particular model. We also experimented with the nature of the interaction between t and sine and cosine. After creating multiple iterations of each format, we removed many with statistically insignificant variables, very predictable residuals, and high AIC and BIC values. For the remainder of part I, we will use our most basic linear model (`model1`) and our most accurate quadratic and periodic model (`model8`).
 
 **(e) For each model, plot the respective residuals vs. fitted values and discuss your observations.**
 ```{r}
@@ -99,7 +100,8 @@ lines(lowess(model8$fit,model8$res),lwd=1.5)
 abline(v=6e5,col="red",lty=2,lwd=1.5)
 legend(0,45,c(expression(y[obs]==y[pred]), "Lowess Smoother"), fill =c("red", "black"),cex=0.6)
 ```
-For model 1, it is clear that the fit of the model overpredicts for high and low values of labor force participation (as indicated by the lowess smoother dipping below 0). It is also that the model underpredicts for most values between 76 and 79. when compared to the plot for model 8, we see that the residuals are largely centered about 0 for all predicted values. This indicates that the inclusion of the periodic and/or quadratic components has given us much better predictive accuracy on our data set.
+
+For `model1`, it is clear that the fit of the model overpredicts for high and low values of labor force participation (as indicated by the lowess smoother dipping below 0). It is also that the model underpredicts for most values between 76 and 79. when compared to the plot for `model8`, we see that the residuals are largely centered about 0 for all predicted values. This indicates that the inclusion of the periodic and/or quadratic components has given us much better predictive accuracy on our data set.
 
 
 **(f) For each model, plot a histogram of the residuals and discuss your observations.**
@@ -118,19 +120,21 @@ lines(density(model8$res),col="red",lwd=2)
 legend(3.5,0.04,c("Density","Normal Distr."),fill=c("red","black"),bty='n')
 ```
 
-The residuals for both models appear close to normal distributions peaking respectively at 0 and 0.2. There appears to be many under predictions of small magnitude and a few over predictions of large magnitude for model 8. This is likely a result of the seasonal behavior of the data which appears to exhibit short periods far below the trend line followed by longer periods just above the trend line. Model 1 appears to be largely symmetric in its distribution of errors.
+The residuals for both models appear close to normal distributions peaking respectively at 0 and 0.2. There appears to be many under predictions of small magnitude and a few over predictions of large magnitude for `model8`. This is likely a result of the seasonal behavior of the data which appears to exhibit short periods far below the trend line followed by longer periods just above the trend line. `model1` appears to be largely symmetric in its distribution of errors.
 
-**(g) For each model, discuss the associated diagnostic statistics (R2, t−distribution, F−distribution, etc.)**
+**(g) For each model, discuss the associated diagnostic statistics ($R^2$, $t$−distribution, $F$−distribution, etc.)**
 ```{r}
 #computing summary statistics for our two chosen modles
 summary(model1)
 summary(model8)
 ```
 
-R-Squared: The adjusted R-squared of model 1 is .9535 while the adjusted R-squared of model8 is .9729. This indicates that both models offer strong predictive accuracy for the data but model 8 is superior.
-T-distribution: The absolute value of the t-values for both regressions' coefficients are all greater than 2, indicating they offer statistical significance.
-F-distribution and P-Value: The F-statistics and P-values support our findings from the t-values. The F-statistics for model1 and model8 are respectively 6876 and 2409, both of which imply the model offers significant explanatory behavior. The p-values for the coefficients in each model are all significantly statistically different from 0. The p-value for both models as a whole are below 2.2e-16 which indicates again that the models offer significant explanatory ability. 
-Therefore, both models are clearly statistically significant even though model 8 accounts for far more behavior.
+$R$-Squared: The adjusted R-squared of `model1` is .9535 while the adjusted R-squared of `model8` is .9729. This indicates that both models offer strong predictive accuracy for the data but `model8` is superior.
+
+$t$-distribution: The absolute value of the $t$-values for both regressions' coefficients are all greater than 2, indicating they offer statistical significance.
+
+$F$-distribution and $p$-Value: The $F$-statistics and $p$-values support our findings from the t-values. The F-statistics for `model1` and `model8` are respectively 6876 and 2409, both of which imply the model offers significant explanatory behavior. The $p$-values for the coefficients in each model are all significantly statistically different from 0. The $p$-value for both models as a whole are below 2.2e-16 which indicates again that the models offer significant explanatory ability. 
+Therefore, both models are clearly statistically significant even though `model8` accounts for far more behavior.
 
 
 **(h) Select a trend model using AIC and one using BIC (show the values obtained from each criterion). Do the selected models agree?**
@@ -140,7 +144,7 @@ AIC(model1,model8)
 BIC(model1,model8)
 ```
 
-The AIC selects model8 and the BIC selects model8 as it appears this model minimizes error even with a higher penalty for more explanatory variables. Due to the lower value of AIC and BIC for model8 this is the model we will use for the remainder of the project.
+The AIC selects `model8` and the BIC selects `model8` as it appears this model minimizes error even with a higher penalty for more explanatory variables. Due to the lower value of AIC and BIC for `model8` this is the model we will use for the remainder of the project.
 
 **(i) Use your preferred model to forecast h-steps (at least 16) ahead. Your forecast should include the respective uncertainty prediction interval. Depending on your data, h will be in days, months, years, etc.**
 ```{r}
@@ -158,17 +162,13 @@ autoplot(Labor,series="Data")+autolayer(forecast(model8ts,newdata=newdata), seri
 forecast(model8ts,newdata=newdata)
 ```
 
-`<!-- comment out repeated code -->
-<!-- ```{r} -->
-<!-- L=read.csv('LaborForce.csv',header=T) -->
-<!-- Labor = ts(L$LNU01327662,start=1992,frequency=12) -->
-<!-- t = time(Labor) -->
+<!-- comment out repeated code -->
 <!-- model8=tslm(Labor~I(t*t)+t*cos(2*pi*t/13)+sin(2*pi*t/13)) -->
-<!-- ``` -->
 
 ### 2. Modeling and Forecasting Seasonality
 
 **(a) Construct and test (by looking at the diagnostic statistics) a model with a full set of seasonal dummies. **
+
 To estimate the seasoanl effect, we use a set of 11 seasonal dummies to indicate whether a particular measurement occured in February, March, etc. It is important to isolate the trend component to the seasonality estimation does not become biased.
 ```{r}
 # regress Labor on linear trend plus full seasonal dummies
@@ -176,7 +176,9 @@ seasonal=tslm(Labor~trend+season)
 # print out summary of model
 summary(seasonal)
 ```
+
 From the test statistics, at 5% level, the intercept, the linear trend, season2, season3, season6, season7. The other seasonal coefficients are not statistically significant from zero. The $R^2_{\mathrm{adj}}$ is 0.9682, indicating a fairly good fit for this simple model. The $p$-value for the $F$ test is lower than 5%, so we reject the null hypothesis that the there is no seasonality or trend at 5% level.
+
 **(b) Plot the estimated seasonal factors and interpret your plot.**
 
 The seasonal effect can be visualized by plotting all the seasonal coefficients. The seasonal coefficients indicate how much on average is the civilian labor force participation rate in a given month is different from that of January. Since our 11 seasonal dummies does not include January (otherwise there would be a collinearity issue and regression would fail), we manually set the coefficient of January to be zero. 
@@ -228,7 +230,6 @@ BIC(full)
 
 Out of all the explanatory variables, only the seasonal dummies for season5, season9, season10, season11, season12 are not significant at 5% level. This means that these seasons do not contribute much to explaining the seasonal variation of the data. The aic and bic values are lower than any of the previous models, meaning that including seasonal effects is crucial to explaining the variations of the data. The $R^2_{\mathrm{adj}}$ increased from the seasonal plus linear trend model, indicating that the trend from problem 1 fits the data better than a naive linear trend.
 
-
 **(e) Use the full model to forecast h-steps (at least 16) ahead. Your forecast should include the respective prediction interval.**
 
 Given the full model which seems to fit existing data well, we attempt to extract forecasts 60 periods ahead ($h=60$), in order to evaluate the degree to which the forecasted values for civilian labor force participation rate is probable.
@@ -252,8 +253,7 @@ The figure above shows the forecast of the full model, with an $h=60$ point and 
 
 We must note that the prediction interval which `forecast` produces must be taken with a grain of salt. This prediction interval does not take into account the error introduced when estimating the model parameters. Adding to that, the error in the cycle period is unaccountable given that we have dictated the period to be 13 based on trial and error. The true prediction interval should be larger.
 
-## III. (5%) Conclusions and Future Work 
-state your conclusion regarding your final model and forecast, and provide some insight as to how it could be improved
+## III. (5%) Conclusions and Future Work
 
 **Conclusions**
 
@@ -275,15 +275,16 @@ Based on these observations, the model forecasts that in the short run (5 years,
 **Future work:**
 
 There are several points where our model could improve:
+
 1. A lack of longtidutinal data: our model used civilian labor force participation rate from 1992 to 2019, some 28 years of data. If we could obtain the data from beyond 1992, we could verify whether the quadratic trend, the 13-year business cycle, and the roughly-constant seasonality are characteristics which persists in the long run, or they are themselves time-varying. With longer-term data, perhaps other trends and cycles are more appropriate.
 2. A lack of latitudinal data: our model used data from the U.S. only, and we only included the civilian labor force participation rate of the people who has Bachelor's degree and higher and are 25 years and over. If we obtained data from other subcategories of the population, and even other countries, we can verify whether or not the dynamics we see in our model is specific to the population and country.
 3. Seasonality assumed constant throughout the 28 years of data: This assumption is an artifact of the regression model we used. To verify whether this assumption is true and improve the model, it is advisable to perform seasonal decomposition with algorithms such as STL, X11, or SEATS.
 4. Residuals assumed to be independent: we have not checked for serial correlation in the residuals of the full model. If there were serial correlation, an ARMA model would perhaps be appropriate.
 
-## IV. (5%) References
-include the source of your data and any other resources
+## IV. References
 
-Civilian Labor Force Participation Rate: Bachelor's Degree and Higher, 25 years and over (LNU01327662), *FRED Economic Data*, accessed Jan 27, 2020, available at: https://fred.stlouisfed.org/series/LNU01327662
+[1] Civilian Labor Force Participation Rate: Bachelor's Degree and Higher, 25 years and over (LNU01327662), *FRED Economic Data*, accessed Jan 27, 2020, available at: https://fred.stlouisfed.org/series/LNU01327662
 
-## V. (10%) R Source code
-Your code needs to include proper comments to help e.g., a non-R expert understand and run your code. If you do not submit your code, you will not receive credit for the assignment.
+## V. R Source code
+
+Provided above in text.

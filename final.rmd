@@ -106,7 +106,7 @@ lines(lowess(model8$fit,model8$res),lwd=2)
 legend(78,2, c(expression(y[obs]==y[pred]), "Lowess Smoother"), fill =c("red", "black"),cex=1,bty="y")
 ```
 
-For `model1`, it is clear that the fit of the model overpredicts for high and low values of labor force participation (as indicated by the lowess smoother dipping below 0). It is also that the model underpredicts for most values between 76 and 78. The residuals clearly show a non random pattern which is cyclical in its nature and so our model is likely missing much of the true behavior of the data. When compared to the plot for `model8`, we see that the residuals are largely centered about 0 for all predicted values. This indicates that the inclusion of the periodic and/or quadratic components has given us much better predictive accuracy on our data set.
+For `model1`, it is clear that the fit of the model overpredicts for high and low values of labor force participation (as indicated by the lowess smoother dipping below 0). It is also clear that the model underpredicts for most values between 76 and 78. The residuals clearly show a non random pattern which is cyclical in its nature and so our model is likely missing much of the true behavior of the data. When compared to the plot for `model8`, we see that the residuals are largely centered about 0 for all predicted values. This indicates that the inclusion of the periodic and/or quadratic components has given us much better predictive accuracy on our data set.
 
 
 **(f) For each model, plot a histogram of the residuals and discuss your observations.**

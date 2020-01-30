@@ -1,6 +1,6 @@
 ---
-title: "Economics 144: Project 1"
-subtitle: "Ryan Chapman and David Su"
+title: "The Fate of Labor Markets for College Graduates"
+subtitle: "Econ 144 Project 1 | Ryan Chapman and David Su"
 output: html_document
 ---
 
